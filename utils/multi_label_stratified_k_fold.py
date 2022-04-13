@@ -72,7 +72,7 @@ for idx, (train_index, val_index) in tqdm(enumerate(mskf.split(x, y)), total=nfo
         value = image[1] 
 
         temp[key] = value
-        temp_train.update(temp)
+        temp_val.update(temp)
     val_dict['images'] = temp_val
 
     train_dir = os.path.join(path, f'cv_train_{idx + 1}.json')
