@@ -43,7 +43,8 @@ def parse_args():
 
     parser.add_argument('--device', default='cuda' if cuda.is_available() else 'cpu')
     parser.add_argument('--num_workers', type=int, default=4)
-
+    parser.add_argument('--resume-from', type=str, default=None)
+    
     parser.add_argument('--image_size', type=int, default=1024)
     parser.add_argument('--input_size', type=int, default=512)
     parser.add_argument('--batch_size', type=int, default=12)
@@ -64,7 +65,7 @@ def parse_args():
 
 
 def do_training(data_dir, model_dir, device, image_size, input_size, num_workers, batch_size,
-                learning_rate, max_epoch, save_interval, log_interval, name, seed, no_val):
+                learning_rate, max_epoch, save_interval, log_interval, name, seed, no_val, resume_from):
     # Seed 설정
     set_seed(seed)
 
@@ -79,7 +80,12 @@ def do_training(data_dir, model_dir, device, image_size, input_size, num_workers
     # Model define
     model = EAST()
     model.to(device)
-    wandb.watch(model)
+    if resume_from:
+        ckpt_path = osp.join(resume_from, 'latest.pth')
+        model.load_state_dict(torch.load(ckpt_path, map_location='cpu'))
+        print("model Loaded Successfully!")
+    
+    
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[100, 150], gamma=0.1)
 
@@ -87,7 +93,23 @@ def do_training(data_dir, model_dir, device, image_size, input_size, num_workers
     mean_loss = None
     if not osp.exists(model_dir):
         os.makedirs(model_dir)
+    else:
+        raise Exception("Folder exist. Please Change model_dir. 폴더 중복입니다. model_dir 새로 지정해주세요")
 
+    #################################################
+    # wandb 넣어줘야할 부분
+    wandb.init(project="", entity="", name=args.name)
+    #################################################
+    wandb.config = {
+        "learning_rate": learning_rate,
+        "epochs": max_epoch,
+        "batch_size": batch_size,
+        "image_size": image_size,
+        "input_size": input_size,
+        "seed": seed
+    }
+    wandb.watch(model)
+    
     model.train()
     for epoch in range(max_epoch):
         epoch_loss, epoch_start = 0, time.time()
@@ -139,16 +161,4 @@ def main(args):
 
 if __name__ == '__main__':
     args = parse_args()
-    #################################################
-    # wandb 넣어줘야할 부분
-    wandb.init(project="", entity="", name=args.name)
-    #################################################
-    wandb.config = {
-        "learning_rate": args.learning_rate,
-        "epochs": args.max_epoch,
-        "batch_size": args.batch_size,
-        "image_size": args.image_size,
-        "input_size": args.input_size,
-        "seed": args.seed
-    }
     main(args)
