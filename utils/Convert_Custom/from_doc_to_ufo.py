@@ -3,8 +3,13 @@ import os, glob, json
 from tqdm import tqdm
 
 anno_root = '/opt/ml/input/data/documents/annotations'
+img_root = '/opt/ml/input/data/documents/images'
 file_list = sorted(glob.glob(os.path.join(anno_root, '*.json')))
+jpg_file_name = glob.glob(os.path.join(img_root, '*.jpg'))
+JPG_file_name = glob.glob(os.path.join(img_root, '*.JPG'))
 
+image_file_dir = sorted(jpg_file_name + JPG_file_name)
+image_file_name = [img.split("/")[-1] for img in image_file_dir]
 
 def check_kor_eng(text : str):
     kor, eng = 0, 0
@@ -26,7 +31,7 @@ def check_kor_eng(text : str):
 # convert to UFO format
 temp_images = {}
 
-for file in tqdm(file_list):
+for i, file in enumerate(tqdm(file_list)):
     anno = {}
 
     with open(file, 'r') as f:
@@ -38,6 +43,7 @@ for file in tqdm(file_list):
         annotations_df = pd.DataFrame.from_dict(annotations)
 
         temp_anno = {}
+
         temp_anno['img_h'] = int(images_df['image.height'].values)
         temp_anno['img_w'] = int(images_df['image.width'].values)
 
@@ -52,9 +58,11 @@ for file in tqdm(file_list):
             illegibility = False
             orientation = 'Horizontal'
             word_tags = 'null'
+
             language = check_kor_eng(transcription)
 
             x, y, w, h = row['annotation.bbox']
+
             points = [[x, y], [x+w, y], [x+w, y+h], [x, y+h]]
 
             temp_word['points'] = points
@@ -66,11 +74,13 @@ for file in tqdm(file_list):
 
             word[idx] = temp_word
 
+
         temp_anno['words'] = word
         temp_anno['tags'] = None
 
-        image_file_name = str(images_df['image.file.name'].values[0]).split(".")[0] + ".JPG"
-        anno[f'{image_file_name}'] = temp_anno
+        img_name = image_file_name[i]
+
+        anno[f'{img_name}'] = temp_anno
 
     temp_images.update(anno)
     
