@@ -10,7 +10,7 @@ Convenience + Insight : 이용자의 편의를 찾는 통찰력
 |[Github](https://github.com/dudskrla) | [Github](https://github.com/KyubumShin) | [Github](https://github.com/sw930718) | [Github](https://github.com/Heruing) | [Github](https://github.com/Su-minn) |
 
 ## Wrap Up Report 📑
-💻 [ConVinsight level2-data-annotation Notion](https://yummy-angle-b95.notion.site/CV-05-Wrap-Up-Report-25e5f0ad2ec84a00a6623acde379dfdf)
+💻 [Data Annotation Notion](https://dudskrla.notion.site/Text-Dectection-3fcd9abd974c4e079d18afb7a21d7707)
 
 ## Final Score 🏆
 - Public f1 score 0.7089 → Private f1 score 0.6790
