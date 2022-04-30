@@ -16,6 +16,8 @@
 <img width="800" alt="image" src="https://user-images.githubusercontent.com/38153357/156905371-3249073f-e5c5-464f-a3dd-f8688baa54e6.gif">
 
 ## Wrap Up Report 📑
+📑 [Image Classification Notion](https://dudskrla.notion.site/Image-Classification-6590e19036224d1bb127e7a34c27bd32)    
+
 ⭐ [[CV-04] Wrap Up Report.pdf](https://github.com/boostcampaitech3/level1-image-classification-level1-cv-04/files/8190326/CV-04.Wrap.Up.Report.pdf)
 
 <br/>
