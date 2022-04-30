@@ -1,3 +1,4 @@
-# 🗂️ code
-### 📑 EDA.ipynb
-object detection EDA
+## 🗃️ code
+- EDA
+- 실험 내용
+- 구현한 코드 
