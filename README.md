@@ -1,4 +1,4 @@
-# boostcamp_optical_character_recognition
+# boostcamp_text_detection
 
 ## 🗂️ Folder 
 ### 📂 code
