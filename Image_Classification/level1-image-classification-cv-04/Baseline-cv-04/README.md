@@ -25,6 +25,16 @@ conda install pytorch torchvision torchaudio cudatoolkit=10.2 -c pytorch
 pip3 install torch torchvision torchaudio
 ```
 
+## 필요한 라이브러리 설치
+
+```
+pip install -r requirements.txt
+```
+
+## 필요한 csv 파일 생성
+```
+python utils/convert_csv.py
+```
 
 ## 학습 실행 예시
 ```
