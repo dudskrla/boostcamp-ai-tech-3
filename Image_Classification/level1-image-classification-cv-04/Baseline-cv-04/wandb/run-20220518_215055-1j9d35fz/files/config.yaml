@@ -1,0 +1,57 @@
+wandb_version: 1
+
+Age bound:
+  desc: null
+  value: 59
+Loss:
+  desc: null
+  value: focal
+Model:
+  desc: null
+  value: resnet18
+Optimizer:
+  desc: null
+  value: Adam
+Resize:
+  desc: null
+  value:
+  - 256
+  - 256
+Weight decay:
+  desc: null
+  value: 0.0005
+_wandb:
+  desc: null
+  value:
+    cli_version: 0.12.16
+    code_path: code/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/main.py
+    framework: torch
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    python_version: 3.8.13
+    start_time: 1652910655
+    t:
+      1:
+      - 1
+      - 5
+      - 41
+      - 53
+      - 55
+      2:
+      - 1
+      - 5
+      - 41
+      - 53
+      - 55
+      3:
+      - 13
+      4: 3.8.13
+      5: 0.12.16
+      8:
+      - 5
+batch_size:
+  desc: null
+  value: 64
+learning_rate:
+  desc: null
+  value: 0.0001

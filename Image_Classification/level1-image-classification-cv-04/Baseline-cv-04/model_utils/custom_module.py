@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-import timm
 
 
 class SE(nn.Module):
@@ -8,6 +7,7 @@ class SE(nn.Module):
 
     출처: https://sseunghyuns.github.io/classification/2021/09/05/blindness-detection/
     """
+
     def __init__(self, num_channels, reduction_ratio=2):
         super().__init__()
         num_channels_reduced = num_channels // reduction_ratio
@@ -58,4 +58,3 @@ class TripleHeadClassifier(nn.Module):
         age = self.age_classifier(x)
 
         return mask, gender, age
-    

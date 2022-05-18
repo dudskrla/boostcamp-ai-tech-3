@@ -5,8 +5,7 @@ import torch.nn.functional as F
 
 # https://discuss.pytorch.org/t/is-this-a-correct-implementation-for-focal-loss-in-pytorch/43327/8
 class FocalLoss(nn.Module):
-    def __init__(self, weight=None,
-                 gamma=2., reduction='mean'):
+    def __init__(self, weight=None, gamma=2.0, reduction="mean"):
         nn.Module.__init__(self)
         self.weight = weight
         self.gamma = gamma
@@ -19,7 +18,7 @@ class FocalLoss(nn.Module):
             ((1 - prob) ** self.gamma) * log_prob,
             target_tensor,
             weight=self.weight,
-            reduction=self.reduction
+            reduction=self.reduction,
         )
 
 
@@ -46,6 +45,7 @@ class F1Loss(nn.Module):
         super().__init__()
         self.classes = classes
         self.epsilon = epsilon
+
     def forward(self, y_pred, y_true):
         assert y_pred.ndim == 2
         assert y_true.ndim == 1
@@ -53,7 +53,7 @@ class F1Loss(nn.Module):
         y_pred = F.softmax(y_pred, dim=1)
 
         tp = (y_true * y_pred).sum(dim=0).to(torch.float32)
-        tn = ((1 - y_true) * (1 - y_pred)).sum(dim=0).to(torch.float32)
+        # tn = ((1 - y_true) * (1 - y_pred)).sum(dim=0).to(torch.float32)
         fp = ((1 - y_true) * y_pred).sum(dim=0).to(torch.float32)
         fn = (y_true * (1 - y_pred)).sum(dim=0).to(torch.float32)
 
@@ -67,20 +67,19 @@ class F1Loss(nn.Module):
 
 # https://www.kaggle.com/c/cassava-leaf-disease-classification/discussion/208239
 class SymmetricCrossEntropyLoss(nn.Module):
-    
-    def __init__(self, alpha=0.1, beta=1.0, num_classes= 18):
+    def __init__(self, alpha=0.1, beta=1.0, num_classes=18):
         super(SymmetricCrossEntropyLoss, self).__init__()
         self.alpha = alpha
         self.beta = beta
         self.num_classes = num_classes
 
-    def forward(self, logits, targets, reduction='mean'):
+    def forward(self, logits, targets, reduction="mean"):
         onehot_targets = torch.eye(self.num_classes)[targets].cuda()
         ce_loss = F.cross_entropy(logits, targets, reduction=reduction)
-        rce_loss = (-onehot_targets*logits.softmax(1).clamp(1e-7, 1.0).log()).sum(1)
-        if reduction == 'mean':
+        rce_loss = (-onehot_targets * logits.softmax(1).clamp(1e-7, 1.0).log()).sum(1)
+        if reduction == "mean":
             rce_loss = rce_loss.mean()
-        elif reduction == 'sum':
+        elif reduction == "sum":
             rce_loss = rce_loss.sum()
         return self.alpha * ce_loss + self.beta * rce_loss
 
@@ -101,7 +100,7 @@ class CrossEntropyF1Loss(nn.Module):
         y_pred = F.softmax(y_pred, dim=1)
 
         tp = (y_true * y_pred).sum(dim=0).to(torch.float32)
-        tn = ((1 - y_true) * (1 - y_pred)).sum(dim=0).to(torch.float32)
+        # tn = ((1 - y_true) * (1 - y_pred)).sum(dim=0).to(torch.float32)
         fp = ((1 - y_true) * y_pred).sum(dim=0).to(torch.float32)
         fn = (y_true * (1 - y_pred)).sum(dim=0).to(torch.float32)
 
@@ -113,8 +112,9 @@ class CrossEntropyF1Loss(nn.Module):
 
         f1_loss = 1 - f1.mean()
 
-        return 0.5*f1_loss + 0.5*ce_loss
-   
+        return 0.5 * f1_loss + 0.5 * ce_loss
+
+
 class CrossEntropyLossWithLabelSmoothing(nn.Module):
     def __init__(self, n_dim=18, ls_=0.9):
         super().__init__()
@@ -133,13 +133,13 @@ class CrossEntropyLossWithLabelSmoothing(nn.Module):
 
 
 _criterion_entrypoints = {
-    'cross_entropy': nn.CrossEntropyLoss,
-    'focal': FocalLoss,
-    'label_smoothing': LabelSmoothingLoss,
-    'f1': F1Loss,
-    'symmetric_cross_entropy': SymmetricCrossEntropyLoss,
-    'cross_entropy_f1': CrossEntropyF1Loss,
-    'cross_entropy_label_smoothing' : CrossEntropyLossWithLabelSmoothing
+    "cross_entropy": nn.CrossEntropyLoss,
+    "focal": FocalLoss,
+    "label_smoothing": LabelSmoothingLoss,
+    "f1": F1Loss,
+    "symmetric_cross_entropy": SymmetricCrossEntropyLoss,
+    "cross_entropy_f1": CrossEntropyF1Loss,
+    "cross_entropy_label_smoothing": CrossEntropyLossWithLabelSmoothing,
 }
 
 
@@ -156,5 +156,5 @@ def create_criterion(criterion_name, **kwargs):
         create_fn = criterion_entrypoint(criterion_name)
         criterion = create_fn(**kwargs)
     else:
-        raise RuntimeError('Unknown loss (%s)' % criterion_name)
+        raise RuntimeError("Unknown loss (%s)" % criterion_name)
     return criterion

@@ -1,0 +1,1926 @@
+diff --git a/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/args.py b/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/args.py
+index 5f29403..e49b55d 100644
+--- a/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/args.py
++++ b/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/args.py
+@@ -1,47 +1,95 @@
+-import torch
+ import argparse
+ 
+-class Args(object):
+-    parser = argparse.ArgumentParser(description='Arguments for Mask Classification train/test')
+-    parser.add_argument('--model', default='efficientnet_b3') ### 
+-    parser.add_argument('--face_center', default=False, help='Use FaceCenterRandomRatioCrop instead of CenterCrop')
+-    parser.add_argument('--cutmix', default=False, help='Use CutMix (vertical half version)')
+-    parser.add_argument('--mixup', default=False, help='Use MixUp')
+-    parser.add_argument('--criterion', default='focal', help='[\'cross_entropy\', \'focal\', \'label_smoothing\', \'f1\']')
+-    parser.add_argument('--optimizer', type=str, default='Adam', help='optimizer type (default: Adam)') 
+-    parser.add_argument('--resize', type=int, nargs="+", default=(312, 312), help='Resize input image')
+-    parser.add_argument('--learning_rate', type=float, default=0.0001, help='Learning rate')
+-    parser.add_argument('--weight_decay', type=float, default=0.0005, help='Weight decay')
+-    parser.add_argument('--batch_size', type=int, default=64, help='Batch size')
+-    parser.add_argument('--random_seed', type=int, default=42, help='Random seed for data split')
+-    parser.add_argument('--device', type=str, default="cuda" if torch.cuda.is_available() else "cpu")
+-    parser.add_argument('--inference', type=bool, default=False, help='Inference single model')
+-    parser.add_argument('--earlystopping_patience', type=int, default=6)
+-    parser.add_argument('--scheduler_patience', type=int, default=2)
+-    parser.add_argument('--age_bound', type=int, default=59)
+-    parser.add_argument('--save_path', default=False, help='Trained model path')
+-    parser.add_argument('--save_logits', default=True, help='Save model logits along answer file')
+-    parser.add_argument('--num_classes', type=int, default=18)
+-    parser.add_argument('--oversampling', type=bool, default=False)
+-    parser.add_argument('--kfold', type=bool, default=False)
+-    parser.add_argument('--multi', type=int, nargs="+", default=[], help='Number of mask, gender, age labels')
+-    parser.add_argument('--multi_weight', type=float, nargs="+", default=[0.25, 0.5, 1.], help='Weight of mask, gender, age labels')
+-    parser.add_argument('--multi_criterion', type=str, default=['cross_entropy', 'cross_entropy', 'focal'], help='Criterion for mask, gender, age labels')
+-    parser.add_argument('--class_weights', type=bool, default=False)
+-    parser.add_argument('--tta', type=bool, default=False, help='Test Time Augmentation (Inference)')
++import torch
+ 
+ 
++class Args(object):
++    parser = argparse.ArgumentParser(
++        description="Arguments for Mask Classification train/test"
++    )
++    parser.add_argument("--model", default="efficientnet_b3")
++    parser.add_argument(
++        "--face_center",
++        default=False,
++        help="Use FaceCenterRandomRatioCrop instead of CenterCrop",
++    )
++    parser.add_argument(
++        "--cutmix", default=False, help="Use CutMix (vertical half version)"
++    )
++    parser.add_argument("--mixup", default=False, help="Use MixUp")
++    parser.add_argument(
++        "--criterion",
++        default="focal",
++        help="['cross_entropy', 'focal', 'label_smoothing', 'f1']",
++    )
++    parser.add_argument(
++        "--optimizer", type=str, default="Adam", help="optimizer type (default: Adam)"
++    )
++    parser.add_argument(
++        "--resize", type=int, nargs="+", default=(312, 312), help="Resize input image"
++    )
++    parser.add_argument(
++        "--learning_rate", type=float, default=0.0001, help="Learning rate"
++    )
++    parser.add_argument(
++        "--weight_decay", type=float, default=0.0005, help="Weight decay"
++    )
++    parser.add_argument("--batch_size", type=int, default=64, help="Batch size")
++    parser.add_argument(
++        "--random_seed", type=int, default=42, help="Random seed for data split"
++    )
++    parser.add_argument(
++        "--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu"
++    )
++    parser.add_argument(
++        "--inference", type=bool, default=False, help="Inference single model"
++    )
++    parser.add_argument("--earlystopping_patience", type=int, default=6)
++    parser.add_argument("--scheduler_patience", type=int, default=2)
++    parser.add_argument("--age_bound", type=int, default=59)
++    parser.add_argument("--save_path", default=False, help="Trained model path")
++    parser.add_argument(
++        "--save_logits", default=True, help="Save model logits along answer file"
++    )
++    parser.add_argument("--num_classes", type=int, default=18)
++    parser.add_argument("--oversampling", type=bool, default=False)
++    parser.add_argument("--kfold", type=bool, default=False)
++    parser.add_argument(
++        "--multi",
++        type=int,
++        nargs="+",
++        default=[],
++        help="Number of mask, gender, age labels",
++    )
++    parser.add_argument(
++        "--multi_weight",
++        type=float,
++        nargs="+",
++        default=[0.25, 0.5, 1.0],
++        help="Weight of mask, gender, age labels",
++    )
++    parser.add_argument(
++        "--multi_criterion",
++        type=str,
++        default=["cross_entropy", "cross_entropy", "focal"],
++        help="Criterion for mask, gender, age labels",
++    )
++    parser.add_argument("--class_weights", type=bool, default=False)
++    parser.add_argument(
++        "--tta", type=bool, default=False, help="Test Time Augmentation (Inference)"
++    )
++
+     parse = parser.parse_args()
+     params = {
+-        "MODEL": parse.model, 
+-        "FACECENTER": parse.face_center, 
+-        "CUTMIX": parse.cutmix, 
+-        "MIXUP": parse.mixup, 
+-        "CRITERION": parse.criterion, 
++        "MODEL": parse.model,
++        "FACECENTER": parse.face_center,
++        "CUTMIX": parse.cutmix,
++        "MIXUP": parse.mixup,
++        "CRITERION": parse.criterion,
+         "OPTIMIZER": parse.optimizer,
+-        "RESIZE": parse.resize, 
++        "RESIZE": parse.resize,
+         "LEARNING_RATE": parse.learning_rate,
+-        "WEIGHT_DECAY": parse.weight_decay, 
++        "WEIGHT_DECAY": parse.weight_decay,
+         "BATCH_SIZE": parse.batch_size,
+         "RANDOM_SEED": parse.random_seed,
+         "DEVICE": parse.device,
+@@ -49,7 +97,7 @@ class Args(object):
+         "EARLYSTOPPING_PATIENCE": parse.earlystopping_patience,
+         "SCHEDULER_PATIENCE": parse.scheduler_patience,
+         "AGE_BOUND": parse.age_bound,
+-        "SAVE_PATH": parse.save_path, 
++        "SAVE_PATH": parse.save_path,
+         "SAVE_LOGITS": parse.save_logits,
+         "NUM_CLASSES": parse.num_classes,
+         "OVERSAMPLING": parse.oversampling,
+@@ -58,5 +106,5 @@ class Args(object):
+         "MULTIWEIGHT": parse.multi_weight,
+         "MULTICRITERION": parse.multi_criterion,
+         "CLASS_WEIGHTS": parse.class_weights,
+-        "TTA": parse.tta
+-    }
+\ No newline at end of file
++        "TTA": parse.tta,
++    }
+diff --git a/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/inference.py b/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/inference.py
+index f46c654..20b2f06 100644
+--- a/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/inference.py
++++ b/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/inference.py
+@@ -1,13 +1,14 @@
+ import os
+-import torch
+-from torchvision import transforms
++
+ import numpy as np
+ import pandas as pd
++import torch
++from torchvision import transforms
+ from tqdm import tqdm
+-from utils.dataset import MaskTestDataset
++
+ 
+ def inference(args, model, test_loader, info):
+-    loop_num = 2 if args["TTA"] else 1 
++    loop_num = 2 if args["TTA"] else 1
+ 
+     preds = []
+     with torch.no_grad():
+@@ -29,16 +30,21 @@ def inference(args, model, test_loader, info):
+     info["ans"] = preds
+     info.to_csv(f"submission/{args['MODEL']}/sub.csv", index=False)
+     print(info["ans"].value_counts().sort_index())
+-    print(f'Inference Done!')
++    print("Inference Done!")
+ 
+-def infer_logits(args, model, train_loader, train_data, valid_loader, valid_data, test_loader, info):
++
++def infer_logits(
++    args, model, train_loader, train_data, valid_loader, valid_data, test_loader, info
++):
+     if not os.path.exists("submission/" + args["MODEL"]):
+         os.makedirs("submission/" + args["MODEL"])
+ 
+-    loop_num = 2 if args["TTA"] else 1 
++    loop_num = 2 if args["TTA"] else 1
+ 
+     with torch.no_grad():
+-        for idx, (images, id_) in enumerate(tqdm(train_loader, total=len(train_loader))):
++        for idx, (images, id_) in enumerate(
++            tqdm(train_loader, total=len(train_loader))
++        ):
+             for loop_id in range(loop_num):
+                 images = transforms.RandomHorizontalFlip(p=loop_id)(images)
+                 images = images.to("cuda")
+@@ -51,16 +57,22 @@ def infer_logits(args, model, train_loader, train_data, valid_loader, valid_data
+                 logits = logit.cpu().numpy()
+             else:
+                 logits = np.append(logits, logit.cpu().numpy(), axis=0)
+-    
++
+     train_logits = train_data[["img_path"]].copy()
+-    logits_df = pd.DataFrame(logits, columns=[f"l{i:0>2}" for i in range(len(logits[0]))])
++    logits_df = pd.DataFrame(
++        logits, columns=[f"l{i:0>2}" for i in range(len(logits[0]))]
++    )
+     train_logits = pd.concat([train_logits, logits_df], axis=1)
+-    train_logits.to_csv(f"submission/{args['MODEL']}/logits_train_{args['MODEL']}.csv", index=False)
+-    print(f'Train Logits Done!')
+-    
++    train_logits.to_csv(
++        f"submission/{args['MODEL']}/logits_train_{args['MODEL']}.csv", index=False
++    )
++    print("Train Logits Done!")
++
+     logits = np.array([])
+     with torch.no_grad():
+-        for idx, (images, id_) in enumerate(tqdm(valid_loader, total=len(valid_loader))):
++        for idx, (images, id_) in enumerate(
++            tqdm(valid_loader, total=len(valid_loader))
++        ):
+             for loop_id in range(loop_num):
+                 images = transforms.RandomHorizontalFlip(p=loop_id)(images)
+                 images = images.to("cuda")
+@@ -73,12 +85,16 @@ def infer_logits(args, model, train_loader, train_data, valid_loader, valid_data
+                 logits = logit.cpu().numpy()
+             else:
+                 logits = np.append(logits, logit.cpu().numpy(), axis=0)
+-    
++
+     valid_logits = valid_data[["img_path"]].copy()
+-    logits_df = pd.DataFrame(logits, columns=[f"l{i:0>2}" for i in range(len(logits[0]))])
++    logits_df = pd.DataFrame(
++        logits, columns=[f"l{i:0>2}" for i in range(len(logits[0]))]
++    )
+     valid_logits = pd.concat([valid_logits, logits_df], axis=1)
+-    valid_logits.to_csv(f"submission/{args['MODEL']}/logits_val_{args['MODEL']}.csv", index=False)
+-    print(f'Validation Logits Done!')
++    valid_logits.to_csv(
++        f"submission/{args['MODEL']}/logits_val_{args['MODEL']}.csv", index=False
++    )
++    print("Validation Logits Done!")
+ 
+     logits = np.array([])
+     with torch.no_grad():
+@@ -95,9 +111,13 @@ def infer_logits(args, model, train_loader, train_data, valid_loader, valid_data
+                 logits = logit.cpu().numpy()
+             else:
+                 logits = np.append(logits, logit.cpu().numpy(), axis=0)
+-    
++
+     test_logits = info[["ImageID"]].copy()
+-    logits_df = pd.DataFrame(logits, columns=[f"l{i:0>2}" for i in range(len(logits[0]))])
++    logits_df = pd.DataFrame(
++        logits, columns=[f"l{i:0>2}" for i in range(len(logits[0]))]
++    )
+     test_logits = pd.concat([test_logits, logits_df], axis=1)
+-    test_logits.to_csv(f"submission/{args['MODEL']}/logits_test_{args['MODEL']}.csv", index=False)
+-    print(f'Test Logits Done!')
++    test_logits.to_csv(
++        f"submission/{args['MODEL']}/logits_test_{args['MODEL']}.csv", index=False
++    )
++    print("Test Logits Done!")
+diff --git a/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/main.py b/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/main.py
+index 098689c..a63a523 100644
+--- a/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/main.py
++++ b/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/main.py
+@@ -1,21 +1,26 @@
+ import os
+-import time
+-import torch
+ import random
++import time
++
+ import numpy as np
+ import pandas as pd
+-from args import Args
+-from glob import glob
++import torch
++import wandb
++from sklearn.model_selection import KFold
++from torch.utils.data import DataLoader, WeightedRandomSampler
+ from tqdm import tqdm
+-from utils.util import age_bound, age_bound_6, get_log, wandb_init, print_metrics
+-from utils.augmentation import get_train_transform, get_train_face_center_crop_transform, get_valid_transform
+-from inference import inference, infer_logits
++
++from args import Args
++from inference import infer_logits, inference
+ from model_utils.model import load_model
+-from torch.utils.data import DataLoader, WeightedRandomSampler
++from trainer.train import train, train_multi
++from utils.augmentation import (
++    get_train_face_center_crop_transform,
++    get_train_transform,
++    get_valid_transform,
++)
+ from utils.dataset import MaskDataset, MaskFaceCenterDataset, MaskTestDataset
+-from trainer.train import train
+-from sklearn.model_selection import KFold
+-import wandb
++from utils.util import age_bound, age_bound_6, get_log, print_metrics, wandb_init
+ 
+ 
+ def main(args, logger, wandb):
+@@ -26,15 +31,13 @@ def main(args, logger, wandb):
+     time_stamp = "_".join(time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()).split(" "))
+     current_dir = os.path.dirname(os.path.realpath(__file__))
+ 
+-
+-
+     if not test_mode:
+         # init
+         wandb_init(args, wandb, time_stamp)
+ 
+         # Load Dataframe
+         data = pd.read_csv(current_dir + "/data/final_train_df.csv")
+-        
++
+         # Age label revision
+         if args["MULTI"] and args["MULTI"][-1] == 6:
+             data = age_bound_6(args, data)
+@@ -43,16 +46,17 @@ def main(args, logger, wandb):
+ 
+         # Class Weight
+         class_dist = data["all"].value_counts().sort_index().values
+-        class_weights = [int(class_dist.sum()/num) for num in class_dist]
+-        class_weights = torch.tensor(class_weights,dtype=torch.float)
+-        
++        class_weights = [int(class_dist.sum() / num) for num in class_dist]
++        class_weights = torch.tensor(class_weights, dtype=torch.float)
++
+         # K-fold
+         kfold = KFold(n_splits=5, shuffle=True, random_state=random_seed)
+-        unique_path =  data['path'].unique() 
++        unique_path = data["path"].unique()
++
++        for fold_num, (train_index, valid_index) in enumerate(
++            kfold.split(unique_path), start=1
++        ):
+ 
+-        for fold_num, (train_index, valid_index) in enumerate(kfold.split(unique_path), start=1):
+-            
+-        
+             train_path = unique_path[train_index]
+             valid_path = unique_path[valid_index]
+ 
+@@ -62,45 +66,105 @@ def main(args, logger, wandb):
+             # Generate train data loader
+             if args["FACECENTER"]:
+                 # outputs face area ratios along images
+-                train_dataset = MaskFaceCenterDataset(X_train, get_train_face_center_crop_transform(args), multi_output=len(args["MULTI"])!=0)
++                train_dataset = MaskFaceCenterDataset(
++                    X_train,
++                    get_train_face_center_crop_transform(args),
++                    multi_output=len(args["MULTI"]) != 0,
++                )
+             else:
+-                train_dataset = MaskDataset(X_train, get_train_transform(args), multi_output=len(args["MULTI"])!=0)
+-        
++                train_dataset = MaskDataset(
++                    X_train,
++                    get_train_transform(args),
++                    multi_output=len(args["MULTI"]) != 0,
++                )
++
+             # Oversampling
+             if args["OVERSAMPLING"]:
+                 sample_weights = [0] * len(train_dataset)
+-                for idx, (_, y) in tqdm(enumerate(train_dataset), total=len(train_dataset)):
++                for idx, (_, y) in tqdm(
++                    enumerate(train_dataset), total=len(train_dataset)
++                ):
+                     class_weight = class_weights[y]
+                     sample_weights[idx] = class_weight
+-                sampler = WeightedRandomSampler(sample_weights, num_samples = len(sample_weights), replacement=True)
+-
+-                train_loader = DataLoader(train_dataset, batch_size=args["BATCH_SIZE"], shuffle=False, sampler=sampler, num_workers=2)
++                sampler = WeightedRandomSampler(
++                    sample_weights, num_samples=len(sample_weights), replacement=True
++                )
++
++                train_loader = DataLoader(
++                    train_dataset,
++                    batch_size=args["BATCH_SIZE"],
++                    shuffle=False,
++                    sampler=sampler,
++                    num_workers=2,
++                )
+ 
+             else:
+-                train_loader = DataLoader(train_dataset, batch_size=args["BATCH_SIZE"], shuffle=True, num_workers=2)
++                train_loader = DataLoader(
++                    train_dataset,
++                    batch_size=args["BATCH_SIZE"],
++                    shuffle=True,
++                    num_workers=2,
++                )
++
++            valid_dataset = MaskDataset(
++                X_valid, get_valid_transform(args), multi_output=len(args["MULTI"]) != 0
++            )
++            valid_loader = DataLoader(
++                valid_dataset,
++                batch_size=args["BATCH_SIZE"],
++                shuffle=False,
++                num_workers=2,
++            )
+ 
+-            valid_dataset = MaskDataset(X_valid, get_valid_transform(args), multi_output=len(args["MULTI"])!=0)
+-            valid_loader = DataLoader(valid_dataset, batch_size=args["BATCH_SIZE"], shuffle=False, num_workers=2)
+-        
+             # Load model
+             model = load_model(args)
+             model.to(device)
+ 
+             # Train model
+-            logger.info("============== (" + str(fold_num) + "-th cross validation start) =================\n")
++            logger.info(
++                "============== ("
++                + str(fold_num)
++                + "-th cross validation start) =================\n"
++            )
+             if args["MULTI"]:
+-                best_val_preds, val_labels, best_f1, best_acc = train_multi(args, model, train_loader, valid_loader, fold_num, time_stamp, class_weights, logger, wandb)
++                best_val_preds, val_labels, best_f1, best_acc = train_multi(
++                    args,
++                    model,
++                    train_loader,
++                    valid_loader,
++                    fold_num,
++                    time_stamp,
++                    class_weights,
++                    logger,
++                    wandb,
++                )
+             else:
+-                best_val_preds, val_labels, best_f1, best_acc = train(args, model, train_loader, valid_loader, fold_num, time_stamp, class_weights, logger, wandb)
+-            
++                best_val_preds, val_labels, best_f1, best_acc = train(
++                    args,
++                    model,
++                    train_loader,
++                    valid_loader,
++                    fold_num,
++                    time_stamp,
++                    class_weights,
++                    logger,
++                    wandb,
++                )
++
+             # Visualize Confusion metrics
+-            print_metrics(best_val_preds, val_labels,  "{}/fold{}_{}_F1_{:.4f}_Acc_{:.4f}".format(time_stamp, fold_num, args['MODEL'], best_f1, best_acc))
++            print_metrics(
++                best_val_preds,
++                val_labels,
++                "{}/fold{}_{}_F1_{:.4f}_Acc_{:.4f}".format(
++                    time_stamp, fold_num, args["MODEL"], best_f1, best_acc
++                ),
++            )
+ 
+             if not args["KFOLD"]:
+-                return 
++                return
++
++        return
+ 
+-        return 
+-    
+     ### Test ###
+     info = pd.read_csv(current_dir + "/data/info.csv")
+     save_path = args["SAVE_PATH"]
+@@ -116,7 +180,9 @@ def main(args, logger, wandb):
+ 
+     # Generate test data loader
+     test_dataset = MaskTestDataset(info, get_valid_transform(args))
+-    test_loader = DataLoader(test_dataset, batch_size=64, shuffle=False, num_workers=2, drop_last=False)
++    test_loader = DataLoader(
++        test_dataset, batch_size=64, shuffle=False, num_workers=2, drop_last=False
++    )
+ 
+     # predict & submit
+     inference(args, model, test_loader, info)
+@@ -126,20 +192,22 @@ def main(args, logger, wandb):
+         print(f"SAVE_LOGITS set to {args['SAVE_LOGITS']}. Saving logits csv file...")
+         # Load Dataframe
+         data = pd.read_csv(current_dir + "/data/final_train_df.csv")
+-        
++
+         # Age label revision
+         data = age_bound(args, data)
+ 
+         # Class Weight
+         class_dist = data["all"].value_counts().sort_index().values
+-        class_weights = [int(class_dist.sum()/num) for num in class_dist]
+-        class_weights = torch.tensor(class_weights,dtype=torch.float)
+-        
++        class_weights = [int(class_dist.sum() / num) for num in class_dist]
++        class_weights = torch.tensor(class_weights, dtype=torch.float)
++
+         # K-fold
+         kfold = KFold(n_splits=5, shuffle=True, random_state=random_seed)
+-        unique_path =  data['path'].unique() 
++        unique_path = data["path"].unique()
+ 
+-        for fold_num, (train_index, valid_index) in enumerate(kfold.split(unique_path), start=1):
++        for fold_num, (train_index, valid_index) in enumerate(
++            kfold.split(unique_path), start=1
++        ):
+             train_path = unique_path[train_index]
+             valid_path = unique_path[valid_index]
+ 
+@@ -148,34 +216,59 @@ def main(args, logger, wandb):
+ 
+             # Generate train data loader
+             train_dataset = MaskDataset(X_train, get_valid_transform(args))
+-            train_loader = DataLoader(train_dataset, batch_size=args["BATCH_SIZE"], shuffle=False, num_workers=2)
++            train_loader = DataLoader(
++                train_dataset,
++                batch_size=args["BATCH_SIZE"],
++                shuffle=False,
++                num_workers=2,
++            )
+ 
+             valid_dataset = MaskDataset(X_valid, get_valid_transform(args))
+-            valid_loader = DataLoader(valid_dataset, batch_size=args["BATCH_SIZE"], shuffle=False, num_workers=2)
++            valid_loader = DataLoader(
++                valid_dataset,
++                batch_size=args["BATCH_SIZE"],
++                shuffle=False,
++                num_workers=2,
++            )
+ 
+             break
+-        
+-        infer_logits(args, model, train_loader, X_train, valid_loader, X_valid, test_loader, info)
++
++        infer_logits(
++            args, model, train_loader, X_train, valid_loader, X_valid, test_loader, info
++        )
++
+ 
+ if __name__ == "__main__":
+ 
+     args = Args().params
+ 
+     logger = get_log(args)
+-    logger.info("\n=========Training Info=========\n"
+-                "Model: {}".format(args['MODEL']) + "\n" +
+-                "Loss: {}".format(args['CRITERION']) + "\n" +
+-                "Optimizer: {}".format(args['OPTIMIZER']) + "\n" +
+-                "Resize: {}".format(args['RESIZE']) + "\n" +
+-                "Batch size: {}".format(args['BATCH_SIZE']) + "\n" +
+-                "Learning rate: {}".format(args['LEARNING_RATE']) + "\n" +
+-                "Weight Decay: {}".format(args['WEIGHT_DECAY']) + "\n" +
+-                "Age bound(>60): {}".format(args['AGE_BOUND']) + "\n" +
+-                "Oversampling: {}".format(args['OVERSAMPLING']) + "\n" + 
+-                "Class weights: {}".format(args['CLASS_WEIGHTS']) + "\n" + 
+-                "===============================")
+-
+-    random_seed = args['RANDOM_SEED']
++    logger.info(
++        "\n=========Training Info=========\n"
++        "Model: {}".format(args["MODEL"])
++        + "\n"
++        + "Loss: {}".format(args["CRITERION"])
++        + "\n"
++        + "Optimizer: {}".format(args["OPTIMIZER"])
++        + "\n"
++        + "Resize: {}".format(args["RESIZE"])
++        + "\n"
++        + "Batch size: {}".format(args["BATCH_SIZE"])
++        + "\n"
++        + "Learning rate: {}".format(args["LEARNING_RATE"])
++        + "\n"
++        + "Weight Decay: {}".format(args["WEIGHT_DECAY"])
++        + "\n"
++        + "Age bound(>60): {}".format(args["AGE_BOUND"])
++        + "\n"
++        + "Oversampling: {}".format(args["OVERSAMPLING"])
++        + "\n"
++        + "Class weights: {}".format(args["CLASS_WEIGHTS"])
++        + "\n"
++        + "==============================="
++    )
++
++    random_seed = args["RANDOM_SEED"]
+     random.seed(random_seed)
+     np.random.seed(random_seed)
+     torch.manual_seed(random_seed)
+diff --git a/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/model_utils/custom_module.py b/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/model_utils/custom_module.py
+index f30165b..fc465ac 100644
+--- a/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/model_utils/custom_module.py
++++ b/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/model_utils/custom_module.py
+@@ -1,6 +1,5 @@
+ import torch
+ import torch.nn as nn
+-import timm
+ 
+ 
+ class SE(nn.Module):
+@@ -8,6 +7,7 @@ class SE(nn.Module):
+ 
+     출처: https://sseunghyuns.github.io/classification/2021/09/05/blindness-detection/
+     """
++
+     def __init__(self, num_channels, reduction_ratio=2):
+         super().__init__()
+         num_channels_reduced = num_channels // reduction_ratio
+@@ -58,4 +58,3 @@ class TripleHeadClassifier(nn.Module):
+         age = self.age_classifier(x)
+ 
+         return mask, gender, age
+-    
+\ No newline at end of file
+diff --git a/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/model_utils/model.py b/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/model_utils/model.py
+index b40715b..024fbe5 100644
+--- a/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/model_utils/model.py
++++ b/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/model_utils/model.py
+@@ -1,22 +1,23 @@
+ import timm
+-import torch
+-import torch.nn as nn
+-from torchvision import models
+ 
+-from model_utils.custom_module import TripleHeadClassifier
++# from model_utils.custom_module import TripleHeadClassifier
++
++# import torch
++# import torch.nn as nn
++# from torchvision import models
+ 
+ 
+ def load_model(args):
+ 
+-    model_type = args['MODEL']
+-    num_classes = args['NUM_CLASSES']
+-    
++    model_type = args["MODEL"]
++    num_classes = args["NUM_CLASSES"]
++
+     if model_type not in dir(timm.models):
+-        raise Exception(f'No model named {model_type}')
+-    
++        raise Exception(f"No model named {model_type}")
++
+     model = timm.create_model(model_type, pretrained=True, num_classes=num_classes)
+ 
+-    if args['MULTI']:
++    if args["MULTI"]:
+         model = change_last_child_module_to_multihead(model, args)
+ 
+     return model
+@@ -25,16 +26,24 @@ def load_model(args):
+ def change_last_child_module_to_multihead(model, args):
+     children = list(model.named_children())[::-1]
+     last_child_name, last_child_module = children[0]
+-    
++
+     # 마지막 child_module에 인접한 Conv / Pool / Linear 레이어 검색
+     found = False
+     for _, child_module in children[1:]:
+         for m in list(child_module.modules())[::-1]:
+             module_type = str(type(m))
+-            if "Conv2d" in module_type or "Pool2d" in module_type or "Linear" in module_type:
+-                found = True; break
+-        if found: break
+-    use_globalpool = "Conv2d" in module_type # 인접한 child_module이 Conv이면 global average pool 수행
++            if (
++                "Conv2d" in module_type
++                or "Pool2d" in module_type
++                or "Linear" in module_type
++            ):
++                found = True
++                break
++        if found:
++            break
++    use_globalpool = (
++        "Conv2d" in module_type
++    )  # 인접한 child_module이 Conv이면 global average pool 수행
+ 
+     for m in last_child_module.modules():
+         if hasattr(m, "in_features"):
+@@ -43,8 +52,10 @@ def change_last_child_module_to_multihead(model, args):
+         elif hasattr(m, "in_channels"):
+             num_inputs = m.in_channels
+             break
+-        
+-    exec(f"model.{last_child_name} = TripleHeadClassifier({num_inputs}, {args['MULTI']}, use_globalpool={use_globalpool})")
++
++    exec(
++        f"model.{last_child_name} = TripleHeadClassifier({num_inputs}, {args['MULTI']}, use_globalpool={use_globalpool})"
++    )
+ 
+     return model
+ 
+@@ -53,4 +64,4 @@ def change_last_child_module_to_multihead(model, args):
+ # if model_type == 'efficientnet-b3':
+ 
+ #     model = models.resnet18(pretrained=True)
+-#     model.fc = nn.Linear(model.fc.in_features, num_classes)
+\ No newline at end of file
++#     model.fc = nn.Linear(model.fc.in_features, num_classes)
+diff --git a/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/trainer/train.py b/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/trainer/train.py
+index 80bdf27..a902681 100644
+--- a/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/trainer/train.py
++++ b/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/trainer/train.py
+@@ -1,32 +1,48 @@
+ import os
++from importlib import import_module
++from pathlib import Path
++
++import numpy as np
+ import torch
+ import torch.nn as nn
+-import numpy as np
+-from pathlib import Path
+-from tqdm import tqdm 
+-from importlib import import_module
+-from utils.loss import create_criterion
+-from utils.augmentation import cutmix
+-from trainer.validation import validation
+ from sklearn.metrics import f1_score
+ from torch.optim.lr_scheduler import ReduceLROnPlateau
++from tqdm import tqdm
++from utils.augmentation import cutmix
++from utils.loss import create_criterion
++
++from trainer.validation import validation, validation_multi
+ 
+ 
+-def train(args, model, train_loader, valid_loader, fold_num, time_stamp, class_weights, logger, wandb):
++def train(
++    args,
++    model,
++    train_loader,
++    valid_loader,
++    fold_num,
++    time_stamp,
++    class_weights,
++    logger,
++    wandb,
++):
+ 
+     model.train()
+     device = args["DEVICE"]
+-    
++
+     criterion = create_criterion(args["CRITERION"])
+-    if args["CRITERION"]=='cross_entropy' and args["CLASS_WEIGHTS"]:
++    if args["CRITERION"] == "cross_entropy" and args["CLASS_WEIGHTS"]:
+         criterion = nn.CrossEntropyLoss(weight=class_weights.to(device))
+         logger.info(f"Class Weight: {class_weights}")
+ 
+     earlystopping_patience = args["EARLYSTOPPING_PATIENCE"]
+     scheduler_patience = args["SCHEDULER_PATIENCE"]
+     opt_module = getattr(import_module("torch.optim"), args["OPTIMIZER"])
+-    optimizer = opt_module(model.parameters(), lr=args["LEARNING_RATE"], weight_decay=args["WEIGHT_DECAY"]) 
+-    scheduler = ReduceLROnPlateau(optimizer, mode='max', factor=0.1, patience=scheduler_patience, verbose=True)
++    optimizer = opt_module(
++        model.parameters(), lr=args["LEARNING_RATE"], weight_decay=args["WEIGHT_DECAY"]
++    )
++    scheduler = ReduceLROnPlateau(
++        optimizer, mode="max", factor=0.1, patience=scheduler_patience, verbose=True
++    )
+ 
+     # 모델 저장 경로 설정
+     save_dir = f"checkpoint/{time_stamp}"
+@@ -39,12 +55,12 @@ def train(args, model, train_loader, valid_loader, fold_num, time_stamp, class_w
+     earlystopping_counter = 0
+     best_val_preds = None
+ 
+-    for epoch in tqdm(range(1, num_epochs+1), total=num_epochs):
++    for epoch in tqdm(range(1, num_epochs + 1), total=num_epochs):
+         total_loss = []
+-        num_correct, num_samples = 0., 0
++        num_correct, num_samples = 0.0, 0
+ 
+         for i, (X, y) in enumerate(tqdm(train_loader, total=len(train_loader))):
+-           
++
+             this_epoch_cutmix = np.random.random() > 0.5
+             this_epoch_mixup = np.random.random() > 0.5
+ 
+@@ -53,30 +69,39 @@ def train(args, model, train_loader, valid_loader, fold_num, time_stamp, class_w
+                 r = X["ratio"].to(device)
+             else:
+                 X_ = X.to(device)
+-                r = torch.ones(y.shape[-1]).to(device) / 2 # 0.5
++                r = torch.ones(y.shape[-1]).to(device) / 2  # 0.5
+             y = y.to(device)
+ 
+             if args["CUTMIX"] and this_epoch_cutmix:
+                 X_, ratio_l, ratio_r, y_l, y_r = cutmix(X_, r, y)
+                 ratio_all = ratio_l + ratio_r
+-                y_same = ((y_l==y_r).type(torch.float) - 1) * -1 # if y_l==y_r -> 0 else 1
++                y_same = (
++                    (y_l == y_r).type(torch.float) - 1
++                ) * -1  # if y_l==y_r -> 0 else 1
+             elif args["MIXUP"] and this_epoch_mixup:
+                 pass
+ 
+             outputs = model(X_)
+             if args["CUTMIX"] and this_epoch_cutmix:
+                 _, preds = torch.topk(outputs, 2)
+-                p_1 = preds[:, 0] # first top value
+-                p_2 = preds[:, 1] / y_same # second top value, if y_l==y_r -> inf else same
+-                n = (p_1==y_l).sum() + (p_1==y_r).sum() + (p_2==y_l).sum() + (p_2==y_r).sum()
++                p_1 = preds[:, 0]  # first top value
++                p_2 = (
++                    preds[:, 1] / y_same
++                )  # second top value, if y_l==y_r -> inf else same
++                n = (
++                    (p_1 == y_l).sum()
++                    + (p_1 == y_r).sum()
++                    + (p_2 == y_l).sum()
++                    + (p_2 == y_r).sum()
++                )
+                 num_correct += torch.div(n, 2)
+             elif args["MIXUP"] and this_epoch_mixup:
+                 pass
+             else:
+                 preds = torch.argmax(outputs, dim=-1)
+-                num_correct += (preds==y).sum()
++                num_correct += (preds == y).sum()
+             num_samples += preds.shape[0]
+-            
++
+             if args["CUTMIX"] and this_epoch_cutmix:
+                 loss_l = criterion(outputs, y_l)
+                 loss_r = criterion(outputs, y_r)
+@@ -88,31 +113,37 @@ def train(args, model, train_loader, valid_loader, fold_num, time_stamp, class_w
+             else:
+                 loss = criterion(outputs, y)
+             total_loss.append(loss.item())
+-            
++
+             optimizer.zero_grad()
+             loss.backward()
+             optimizer.step()
+ 
+-        train_accuracy = num_correct/num_samples
+-        train_loss = sum(total_loss)/len(total_loss)
++        train_accuracy = num_correct / num_samples
++        train_loss = sum(total_loss) / len(total_loss)
+ 
+         with torch.no_grad():
+             model.eval()
+-            val_preds, val_labels, val_accuarcy, val_loss = validation(model, valid_loader, criterion, device)
+-            
++            val_preds, val_labels, val_accuarcy, val_loss = validation(
++                model, valid_loader, criterion, device
++            )
++
+             # F-1 Score
+-            f1 = f1_score(val_labels, val_preds, average='macro')
+-
+-        logger.info("Epoch: {}/{}.. ".format(epoch, num_epochs) +
+-                    "Training Accuracy: {:.4f}.. ".format(train_accuracy) + 
+-                    "Training Loss: {:.4f}.. ".format(train_loss) +
+-                    "Valid Accuracy: {:.4f}.. ".format(val_accuarcy) + 
+-                    "Valid F1-Score: {:.4f}.. ".format(f1) + 
+-                    "Valid Loss: {:.4f}.. ".format(val_loss))
+-        if fold_num==1:
+-            wandb.log({'Valid accuracy': val_accuarcy, 'Valid F1': f1, 'Valid Loss': val_loss})
++            f1 = f1_score(val_labels, val_preds, average="macro")
++
++        logger.info(
++            "Epoch: {}/{}.. ".format(epoch, num_epochs)
++            + "Training Accuracy: {:.4f}.. ".format(train_accuracy)
++            + "Training Loss: {:.4f}.. ".format(train_loss)
++            + "Valid Accuracy: {:.4f}.. ".format(val_accuarcy)
++            + "Valid F1-Score: {:.4f}.. ".format(f1)
++            + "Valid Loss: {:.4f}.. ".format(val_loss)
++        )
++        if fold_num == 1:
++            wandb.log(
++                {"Valid accuracy": val_accuarcy, "Valid F1": f1, "Valid Loss": val_loss}
++            )
+         model.train()
+-        
++
+         # Save Model
+         if best_f1 < f1:
+             logger.info("Val F1 improved from {:.3f} -> {:.3f}".format(best_f1, f1))
+@@ -123,52 +154,73 @@ def train(args, model, train_loader, valid_loader, fold_num, time_stamp, class_w
+ 
+             checkpoint = {
+                 "state_dict": model.state_dict(),
+-                "optimizer": optimizer.state_dict()
+-                }    
+-            
++                "optimizer": optimizer.state_dict(),
++            }
++
++            save_path = save_dir + "/Fold{}_{}_Epoch{}_{:.3f}_{}.tar".format(
++                fold_num, args["MODEL"], epoch, best_f1, args["CRITERION"]
++            )
+             # 기존 경로 제거
+             try:
+                 os.remove(save_path)
+-            except:
++            except FileNotFoundError:
+                 pass
+-            save_path = save_dir + "/Fold{}_{}_Epoch{}_{:.3f}_{}.tar".format(fold_num, args['MODEL'], epoch, best_f1, args["CRITERION"])
+-            
++
+             torch.save(checkpoint, save_path)
+             earlystopping_counter = 0
+ 
+         else:
+             earlystopping_counter += 1
+-            logger.info("Valid F1 did not improved from {:.3f}.. Counter {}/{}".format(best_f1, earlystopping_counter, earlystopping_patience))
++            logger.info(
++                "Valid F1 did not improved from {:.3f}.. Counter {}/{}".format(
++                    best_f1, earlystopping_counter, earlystopping_patience
++                )
++            )
+             if earlystopping_counter > earlystopping_patience:
+                 logger.info("Early Stopped ...")
+                 break
+-        
++
+         scheduler.step(f1)
+ 
+     return best_val_preds, val_labels, best_f1, best_acc
+ 
+-def train_multi(args, model, train_loader, valid_loader, fold_num, time_stamp, class_weights, logger, wandb):
++
++def train_multi(
++    args,
++    model,
++    train_loader,
++    valid_loader,
++    fold_num,
++    time_stamp,
++    class_weights,
++    logger,
++    wandb,
++):
+ 
+     model.train()
+     device = args["DEVICE"]
+-    
++
+     criterion0 = create_criterion(args["MULTICRITERION"][0])
+     criterion1 = create_criterion(args["MULTICRITERION"][1])
+     criterion2 = create_criterion(args["MULTICRITERION"][2])
+     if args["CLASS_WEIGHTS"]:
+-        if args["MULTICRITERION"][0]=='cross_entropy':
++        if args["MULTICRITERION"][0] == "cross_entropy":
+             criterion0 = nn.CrossEntropyLoss(weight=class_weights.to(device))
+-        if args["MULTICRITERION"][1]=='cross_entropy':
++        if args["MULTICRITERION"][1] == "cross_entropy":
+             criterion1 = nn.CrossEntropyLoss(weight=class_weights.to(device))
+-        if args["MULTICRITERION"][2]=='cross_entropy':
++        if args["MULTICRITERION"][2] == "cross_entropy":
+             criterion2 = nn.CrossEntropyLoss(weight=class_weights.to(device))
+         logger.info(f"Class Weight: {class_weights}")
+ 
+     earlystopping_patience = args["EARLYSTOPPING_PATIENCE"]
+     scheduler_patience = args["SCHEDULER_PATIENCE"]
+     opt_module = getattr(import_module("torch.optim"), args["OPTIMIZER"])
+-    optimizer = opt_module(model.parameters(), lr=args["LEARNING_RATE"], weight_decay=args["WEIGHT_DECAY"]) 
+-    scheduler = ReduceLROnPlateau(optimizer, mode='max', factor=0.1, patience=scheduler_patience, verbose=True)
++    optimizer = opt_module(
++        model.parameters(), lr=args["LEARNING_RATE"], weight_decay=args["WEIGHT_DECAY"]
++    )
++    scheduler = ReduceLROnPlateau(
++        optimizer, mode="max", factor=0.1, patience=scheduler_patience, verbose=True
++    )
+ 
+     # 모델 저장 경로 설정
+     save_dir = f"checkpoint/{time_stamp}"
+@@ -181,12 +233,12 @@ def train_multi(args, model, train_loader, valid_loader, fold_num, time_stamp, c
+     earlystopping_counter = 0
+     best_val_preds = None
+ 
+-    for epoch in tqdm(range(1, num_epochs+1), total=num_epochs):
++    for epoch in tqdm(range(1, num_epochs + 1), total=num_epochs):
+         total_loss = []
+-        num_correct, num_samples = 0., 0
++        num_correct, num_samples = 0.0, 0
+ 
+         for i, (X, y) in enumerate(tqdm(train_loader, total=len(train_loader))):
+-           
++
+             this_epoch_cutmix = np.random.random() > 0.5
+             this_epoch_mixup = np.random.random() > 0.5
+ 
+@@ -195,38 +247,71 @@ def train_multi(args, model, train_loader, valid_loader, fold_num, time_stamp, c
+                 r = X["ratio"].to(device)
+             else:
+                 X_ = X.to(device)
+-                r = torch.ones(y["ans"].shape[-1]).to(device) / 2 # 0.5
+-            y_m, y_g, y_a, y = \
+-                y["mask"].to(device), y["gender"].to(device), y["age"].to(device), y["ans"].to(device)
++                r = torch.ones(y["ans"].shape[-1]).to(device) / 2  # 0.5
++            y_m, y_g, y_a, y = (
++                y["mask"].to(device),
++                y["gender"].to(device),
++                y["age"].to(device),
++                y["ans"].to(device),
++            )
+ 
+             if args["CUTMIX"] and this_epoch_cutmix:
+-                y_all = torch.cat([y_m.unsqueeze(1), y_g.unsqueeze(1), y_a.unsqueeze(1)], dim=1)
++                y_all = torch.cat(
++                    [y_m.unsqueeze(1), y_g.unsqueeze(1), y_a.unsqueeze(1)], dim=1
++                )
+                 X_, ratio_l, ratio_r, y_l, y_r = cutmix(X_, r, y_all)
+                 y_m_l, y_g_l, y_a_l = y_l[:, 0], y_l[:, 1], y_l[:, 2]
+                 y_m_r, y_g_r, y_a_r = y_r[:, 0], y_r[:, 1], y_r[:, 2]
+                 ratio_all = ratio_l + ratio_r
+-                y_m_same = ((y_m_l==y_m_r).type(torch.float) - 1) * -1 # if y_m_l==y_m_r -> 0 else 1
+-                y_g_same = ((y_g_l==y_g_r).type(torch.float) - 1) * -1 # if y_g_l==y_g_r -> 0 else 1
+-                y_a_same = ((y_a_l==y_a_r).type(torch.float) - 1) * -1 # if y_a_l==y_a_r -> 0 else 1
++                y_m_same = (
++                    (y_m_l == y_m_r).type(torch.float) - 1
++                ) * -1  # if y_m_l==y_m_r -> 0 else 1
++                y_g_same = (
++                    (y_g_l == y_g_r).type(torch.float) - 1
++                ) * -1  # if y_g_l==y_g_r -> 0 else 1
++                y_a_same = (
++                    (y_a_l == y_a_r).type(torch.float) - 1
++                ) * -1  # if y_a_l==y_a_r -> 0 else 1
+             elif args["MIXUP"] and this_epoch_mixup:
+                 pass
+ 
+             outputs_m, outputs_g, outputs_a = model(X_)
+             if args["CUTMIX"] and this_epoch_cutmix:
+                 _, preds_m = torch.topk(outputs_m, 2)
+-                p_m_1 = preds_m[:, 0] # first top value
+-                p_m_2 = preds_m[:, 1] / y_m_same # second top value, if y_m_l==y_m_r -> inf else same
+-                n = (p_m_1==y_m_l).sum() + (p_m_1==y_m_r).sum() + (p_m_2==y_m_l).sum() + (p_m_2==y_m_r).sum()
++                p_m_1 = preds_m[:, 0]  # first top value
++                p_m_2 = (
++                    preds_m[:, 1] / y_m_same
++                )  # second top value, if y_m_l==y_m_r -> inf else same
++                n = (
++                    (p_m_1 == y_m_l).sum()
++                    + (p_m_1 == y_m_r).sum()
++                    + (p_m_2 == y_m_l).sum()
++                    + (p_m_2 == y_m_r).sum()
++                )
+ 
+                 _, preds_g = torch.topk(outputs_g, 2)
+-                p_g_1 = preds_g[:, 0] # first top value
+-                p_g_2 = preds_g[:, 1] / y_g_same # second top value, if y_g_l==y_g_r -> inf else same
+-                n += (p_g_1==y_g_l).sum() + (p_g_1==y_g_r).sum() + (p_g_2==y_g_l).sum() + (p_g_2==y_g_r).sum()
++                p_g_1 = preds_g[:, 0]  # first top value
++                p_g_2 = (
++                    preds_g[:, 1] / y_g_same
++                )  # second top value, if y_g_l==y_g_r -> inf else same
++                n += (
++                    (p_g_1 == y_g_l).sum()
++                    + (p_g_1 == y_g_r).sum()
++                    + (p_g_2 == y_g_l).sum()
++                    + (p_g_2 == y_g_r).sum()
++                )
+ 
+                 _, preds_a = torch.topk(outputs_a, 2)
+-                p_a_1 = preds_a[:, 0] # first top value
+-                p_a_2 = preds_a[:, 1] / y_a_same # second top value, if y_a_l==y_a_r -> inf else same
+-                n += (p_a_1==y_a_l).sum() + (p_a_1==y_a_r).sum() + (p_a_2==y_a_l).sum() + (p_a_2==y_a_r).sum()
++                p_a_1 = preds_a[:, 0]  # first top value
++                p_a_2 = (
++                    preds_a[:, 1] / y_a_same
++                )  # second top value, if y_a_l==y_a_r -> inf else same
++                n += (
++                    (p_a_1 == y_a_l).sum()
++                    + (p_a_1 == y_a_r).sum()
++                    + (p_a_2 == y_a_l).sum()
++                    + (p_a_2 == y_a_r).sum()
++                )
+ 
+                 num_correct += torch.div(n, 6)
+             elif args["MIXUP"] and this_epoch_mixup:
+@@ -235,19 +320,19 @@ def train_multi(args, model, train_loader, valid_loader, fold_num, time_stamp, c
+                 preds_m = torch.argmax(outputs_m, dim=-1)
+                 preds_g = torch.argmax(outputs_g, dim=-1)
+                 preds_a = torch.argmax(outputs_a, dim=-1)
+-                n = (preds_m==y_m).sum()
+-                n += (preds_g==y_g).sum()
+-                n += (preds_a==y_a).sum()
++                n = (preds_m == y_m).sum()
++                n += (preds_g == y_g).sum()
++                n += (preds_a == y_a).sum()
+                 num_correct += torch.div(n, 3)
+             num_samples += preds_m.shape[0]
+-            
++
+             if args["CUTMIX"] and this_epoch_cutmix:
+                 loss_l = criterion0(outputs_m, y_m_l)
+                 loss_r = criterion0(outputs_m, y_m_r)
+                 ratio_l = torch.sum(ratio_l / ratio_all) / ratio_all.shape[0]
+                 ratio_r = torch.sum(ratio_r / ratio_all) / ratio_all.shape[0]
+                 loss0 = ratio_l * loss_l + ratio_r * loss_r
+-                
++
+                 loss_l = criterion1(outputs_m, y_g_l)
+                 loss_r = criterion1(outputs_m, y_g_r)
+                 ratio_l = torch.sum(ratio_l / ratio_all) / ratio_all.shape[0]
+@@ -265,33 +350,43 @@ def train_multi(args, model, train_loader, valid_loader, fold_num, time_stamp, c
+                 loss0 = criterion0(outputs_m, y_m)
+                 loss1 = criterion1(outputs_g, y_g)
+                 loss2 = criterion2(outputs_a, y_a)
+-            loss = (args["MULTIWEIGHT"][0] * loss0 + args["MULTIWEIGHT"][1] * loss1 + args["MULTIWEIGHT"][2] * loss2) / 3
++            loss = (
++                args["MULTIWEIGHT"][0] * loss0
++                + args["MULTIWEIGHT"][1] * loss1
++                + args["MULTIWEIGHT"][2] * loss2
++            ) / 3
+             total_loss.append(loss.item())
+-            
++
+             optimizer.zero_grad()
+             loss.backward()
+             optimizer.step()
+ 
+-        train_accuracy = num_correct/num_samples
+-        train_loss = sum(total_loss)/len(total_loss)
++        train_accuracy = num_correct / num_samples
++        train_loss = sum(total_loss) / len(total_loss)
+ 
+         with torch.no_grad():
+             model.eval()
+-            val_preds, val_labels, val_accuarcy, val_loss = validation_multi(model, valid_loader, criterion0, criterion1, criterion2, device, args)
+-            
++            val_preds, val_labels, val_accuarcy, val_loss = validation_multi(
++                model, valid_loader, criterion0, criterion1, criterion2, device, args
++            )
++
+             # F-1 Score
+-            f1 = f1_score(val_labels, val_preds, average='macro')
+-
+-        logger.info("Epoch: {}/{}.. ".format(epoch, num_epochs) +
+-                    "Training Accuracy: {:.4f}.. ".format(train_accuracy) + 
+-                    "Training Loss: {:.4f}.. ".format(train_loss) +
+-                    "Valid Accuracy: {:.4f}.. ".format(val_accuarcy) + 
+-                    "Valid F1-Score: {:.4f}.. ".format(f1) + 
+-                    "Valid Loss: {:.4f}.. ".format(val_loss))
+-        if fold_num==1:
+-            wandb.log({'Valid accuracy': val_accuarcy, 'Valid F1': f1, 'Valid Loss': val_loss})
++            f1 = f1_score(val_labels, val_preds, average="macro")
++
++        logger.info(
++            "Epoch: {}/{}.. ".format(epoch, num_epochs)
++            + "Training Accuracy: {:.4f}.. ".format(train_accuracy)
++            + "Training Loss: {:.4f}.. ".format(train_loss)
++            + "Valid Accuracy: {:.4f}.. ".format(val_accuarcy)
++            + "Valid F1-Score: {:.4f}.. ".format(f1)
++            + "Valid Loss: {:.4f}.. ".format(val_loss)
++        )
++        if fold_num == 1:
++            wandb.log(
++                {"Valid accuracy": val_accuarcy, "Valid F1": f1, "Valid Loss": val_loss}
++            )
+         model.train()
+-        
++
+         # Save Model
+         if best_f1 < f1:
+             logger.info("Val F1 improved from {:.3f} -> {:.3f}".format(best_f1, f1))
+@@ -301,27 +396,39 @@ def train_multi(args, model, train_loader, valid_loader, fold_num, time_stamp, c
+ 
+             checkpoint = {
+                 "state_dict": model.state_dict(),
+-                "optimizer": optimizer.state_dict()
+-                }    
+-            
+-            torch.save(checkpoint, "/Fold{}_{}_Epoch{}_{:.3f}_{}.tar".format(fold_num, args['MODEL'], epoch, best_f1, args["CRITERION"]))
++                "optimizer": optimizer.state_dict(),
++            }
++
++            torch.save(
++                checkpoint,
++                "/Fold{}_{}_Epoch{}_{:.3f}_{}.tar".format(
++                    fold_num, args["MODEL"], epoch, best_f1, args["CRITERION"]
++                ),
++            )
++
++            save_path = save_dir + "/Fold{}_{}_Epoch{}_{:.3f}_{}.tar".format(
++                fold_num, args["MODEL"], epoch, best_f1, args["CRITERION"]
++            )
+             # 기존 경로 제거
+             try:
+                 os.remove(save_path)
+-            except:
++            except FileNotFoundError:
+                 pass
+-            save_path = save_dir + "/Fold{}_{}_Epoch{}_{:.3f}_{}.tar".format(fold_num, args['MODEL'], epoch, best_f1, args["CRITERION"])
+-            
++
+             torch.save(checkpoint, save_path)
+             earlystopping_counter = 0
+ 
+         else:
+             earlystopping_counter += 1
+-            logger.info("Valid F1 did not improved from {:.3f}.. Counter {}/{}".format(best_f1, earlystopping_counter, earlystopping_patience))
++            logger.info(
++                "Valid F1 did not improved from {:.3f}.. Counter {}/{}".format(
++                    best_f1, earlystopping_counter, earlystopping_patience
++                )
++            )
+             if earlystopping_counter > earlystopping_patience:
+                 logger.info("Early Stopped ...")
+                 break
+-        
++
+         scheduler.step(f1)
+ 
+     return best_val_preds, val_labels, best_f1, best_acc
+diff --git a/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/trainer/validation.py b/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/trainer/validation.py
+index 270b23d..79a29da 100644
+--- a/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/trainer/validation.py
++++ b/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/trainer/validation.py
+@@ -1,11 +1,11 @@
+-import torch
+ import numpy as np
++import torch
+ from tqdm import tqdm
+ 
+ 
+ def validation(model, loader, criterion, device):
+     val_losses = []
+-    all_preds, all_labels =[], []
++    all_preds, all_labels = [], []
+     num_correct, num_samples = 0, 0
+ 
+     for X, y in tqdm(loader, total=len(loader)):
+@@ -16,48 +16,65 @@ def validation(model, loader, criterion, device):
+         loss = criterion(outputs, y)
+ 
+         preds = torch.argmax(outputs, dim=-1)
+-        num_correct += (preds==y).sum()
++        num_correct += (preds == y).sum()
+         num_samples += preds.shape[0]
+ 
+         all_preds.append(preds.detach().cpu().numpy())
+         all_labels.append(y.detach().cpu().numpy())
+         val_losses.append(loss.item())
+ 
+-    val_accuracy = "{:.6f}".format(num_correct/num_samples)
+-    val_loss_total = "{:.6f}".format(sum(val_losses)/len(val_losses))
++    val_accuracy = "{:.6f}".format(num_correct / num_samples)
++    val_loss_total = "{:.6f}".format(sum(val_losses) / len(val_losses))
+     torch.cuda.empty_cache()
+-    return np.concatenate(all_preds, axis=0), np.concatenate(all_labels, axis=0), np.float(val_accuracy), np.float(val_loss_total)
++    return (
++        np.concatenate(all_preds, axis=0),
++        np.concatenate(all_labels, axis=0),
++        np.float(val_accuracy),
++        np.float(val_loss_total),
++    )
+ 
+ 
+ def validation_multi(model, loader, criterion0, criterion1, criterion2, device, args):
+     val_losses = []
+-    all_preds, all_labels =[], []
++    all_preds, all_labels = [], []
+     num_correct, num_samples = 0, 0
+ 
+     for X, y in tqdm(loader, total=len(loader)):
+         X = X.to(device)
+-        y_m, y_g, y_a, y = \
+-            y["mask"].to(device), y["gender"].to(device), y["age"].to(device), y["ans"].to(device)
++        y_m, y_g, y_a, y = (
++            y["mask"].to(device),
++            y["gender"].to(device),
++            y["age"].to(device),
++            y["ans"].to(device),
++        )
+ 
+         outputs_m, outputs_g, outputs_a = model(X)
+         loss0 = criterion0(outputs_m, y_m)
+         loss1 = criterion1(outputs_g, y_g)
+         loss2 = criterion2(outputs_a, y_a)
+-        loss = (args["MULTIWEIGHT"][0] * loss0 + args["MULTIWEIGHT"][1] * loss1 + args["MULTIWEIGHT"][2] * loss2) / 3
++        loss = (
++            args["MULTIWEIGHT"][0] * loss0
++            + args["MULTIWEIGHT"][1] * loss1
++            + args["MULTIWEIGHT"][2] * loss2
++        ) / 3
+ 
+         preds_m = torch.argmax(outputs_m, dim=-1)
+         preds_g = torch.argmax(outputs_g, dim=-1)
+         preds_a = torch.argmax(outputs_a, dim=-1)
+-        n = (preds_m==y_m).sum()
+-        n += (preds_g==y_g).sum()
+-        n += (preds_a==y_a).sum()
++        n = (preds_m == y_m).sum()
++        n += (preds_g == y_g).sum()
++        n += (preds_a == y_a).sum()
+         num_correct += torch.div(n, 3)
+         num_samples += preds_m.shape[0]
+ 
+         if args["MULTI"][-1] == 3:
+             preds = preds_m * 6 + preds_g * 3 + preds_a
+         elif args["MULTI"][-1] == 6:
+-            preds = preds_m * 6 + preds_g * 3 + torch.div(preds_a+1, 3, rounding_mode="floor")
++            preds = (
++                preds_m * 6
++                + preds_g * 3
++                + torch.div(preds_a + 1, 3, rounding_mode="floor")
++            )
+         else:
+             pass
+ 
+@@ -65,7 +82,12 @@ def validation_multi(model, loader, criterion0, criterion1, criterion2, device,
+         all_labels.append(y.detach().cpu().numpy())
+         val_losses.append(loss.item())
+ 
+-    val_accuracy = "{:.6f}".format(num_correct/num_samples)
+-    val_loss_total = "{:.6f}".format(sum(val_losses)/len(val_losses))
++    val_accuracy = "{:.6f}".format(num_correct / num_samples)
++    val_loss_total = "{:.6f}".format(sum(val_losses) / len(val_losses))
+     torch.cuda.empty_cache()
+-    return np.concatenate(all_preds, axis=0), np.concatenate(all_labels, axis=0), np.float(val_accuracy), np.float(val_loss_total)
++    return (
++        np.concatenate(all_preds, axis=0),
++        np.concatenate(all_labels, axis=0),
++        np.float(val_accuracy),
++        np.float(val_loss_total),
++    )
+diff --git a/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/utils/augmentation.py b/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/utils/augmentation.py
+index 9e86a68..e153e9f 100644
+--- a/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/utils/augmentation.py
++++ b/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/utils/augmentation.py
+@@ -1,6 +1,6 @@
++import albumentations as A
+ import numpy as np
+ import torch
+-import albumentations as A
+ from albumentations.pytorch import ToTensorV2
+ 
+ 
+@@ -11,8 +11,9 @@ class FaceCenterRandomRatioCrop:
+         - sample에는 이미지와 bbox 정보가 포함되어 있어야 합니다.
+         - 이 augmentation을 거친 이미즈의 사이즈는 이미지마다 상이합니다.
+     """
++
+     def __init__(self, ratio_range=(0.2, 0.4)):
+-        # 예시: ratio_range가 (0.2, 0.4)일 때, 얼굴의 영역은 전체 이미지의 
++        # 예시: ratio_range가 (0.2, 0.4)일 때, 얼굴의 영역은 전체 이미지의
+         #       20% ~ 40%를 차지하도록 조절됩니다.
+         self.ratio_range = ratio_range
+ 
+@@ -21,34 +22,47 @@ class FaceCenterRandomRatioCrop:
+         image, (h, w, x, y) = sample["image"], sample["bbox"]
+ 
+         # (x, y)는 bbox의 좌측 상단 꼭지점 좌표입니다.
+-        cen_x, cen_y = round(x + w/2), round(y + h/2)
++        cen_x, cen_y = round(x + w / 2), round(y + h / 2)
+ 
+         face_area = h * w
+         img_area = face_area / ratio
+-        img_wh = round(img_area ** 0.5) # img width를 img height와 동일하게 설정합니다.
+-        img_wh = img_wh + 1 if img_wh % 2 == 1 else img_wh # 짝수로 맞춰줍니다.
++        img_wh = round(img_area**0.5)  # img width를 img height와 동일하게 설정합니다.
++        img_wh = img_wh + 1 if img_wh % 2 == 1 else img_wh  # 짝수로 맞춰줍니다.
+ 
+         image = np.array(image)
+         origin_h, origin_w, _ = image.shape
+-        move_u, move_d, move_l, move_r = cen_y-img_wh//2, origin_h-(cen_y+img_wh//2), cen_x-img_wh//2, origin_w-(cen_x+img_wh//2)
++        move_u, move_d, move_l, move_r = (
++            cen_y - img_wh // 2,
++            origin_h - (cen_y + img_wh // 2),
++            cen_x - img_wh // 2,
++            origin_w - (cen_x + img_wh // 2),
++        )
+         # pad or crop up
+         if move_u < 0:
+-            image = np.pad(image, ((-move_u, 0), (0, 0), (0, 0)), "constant", constant_values=0)
++            image = np.pad(
++                image, ((-move_u, 0), (0, 0), (0, 0)), "constant", constant_values=0
++            )
+         elif move_u > 0:
+             image = image[move_u:, :, :]
+         # pad or crop down
+         if move_d < 0:
+-            image = np.pad(image, ((0, -move_d), (0, 0), (0, 0)), "constant", constant_values=0)
++            image = np.pad(
++                image, ((0, -move_d), (0, 0), (0, 0)), "constant", constant_values=0
++            )
+         elif move_d > 0:
+             image = image[:-move_d, :, :]
+         # pad or crop left
+         if move_l < 0:
+-            image = np.pad(image, ((0, 0), (-move_l, 0), (0, 0)), "constant", constant_values=0)
++            image = np.pad(
++                image, ((0, 0), (-move_l, 0), (0, 0)), "constant", constant_values=0
++            )
+         elif move_l > 0:
+             image = image[:, move_l:, :]
+         # pad or crop right
+         if move_r < 0:
+-            image = np.pad(image, ((0, 0), (0, -move_r), (0, 0)), "constant", constant_values=0)
++            image = np.pad(
++                image, ((0, 0), (0, -move_r), (0, 0)), "constant", constant_values=0
++            )
+         elif move_r > 0:
+             image = image[:, :-move_r, :]
+ 
+@@ -60,9 +74,10 @@ class MinMaxScaleByDivision:
+ 
+     모든 픽셀을 0에서 1 범위로 정규화 시켜줍니다.
+     """
+-    def __init__(self, div_num=255.):
++
++    def __init__(self, div_num=255.0):
+         self.div_num = div_num
+-    
++
+     def __call__(self, sample):
+         return sample / self.div_num
+ 
+@@ -73,60 +88,76 @@ def cutmix(data, ratio, target=None):
+     shuffled_ratio = ratio[indices]
+     shuffled_target = target[indices]
+ 
+-    shuffled_data[:, :, :, :shuffled_data.shape[3]//2] = data[:, :, :, :data.shape[3]//2]
++    shuffled_data[:, :, :, : shuffled_data.shape[3] // 2] = data[
++        :, :, :, : data.shape[3] // 2
++    ]
+ 
+     return shuffled_data, ratio, shuffled_ratio, target, shuffled_target
+ 
+ 
+ ##### get train/valid transform #####
+ 
++
+ def get_train_transform(args):
+-    return A.Compose([
+-                    A.CenterCrop(height=int(512*0.9), width=int(384*0.9), p=1),
+-                    A.ShiftScaleRotate(scale_limit=0, shift_limit=0.02, rotate_limit=0, p=0.5),
+-                    A.HorizontalFlip(p=0.5),
+-                    A.Resize(width=args["RESIZE"][0], height=args["RESIZE"][1]),
+-                    A.CLAHE(),
+-                    A.Normalize(
+-                        mean=[0.56, 0.524, 0.501],
+-                        std=[0.258, 0.265, 0.267],
+-                        max_pixel_value=255.0),
+-                    ToTensorV2()
+-                    ])
++    return A.Compose(
++        [
++            A.CenterCrop(height=int(512 * 0.9), width=int(384 * 0.9), p=1),
++            A.ShiftScaleRotate(scale_limit=0, shift_limit=0.02, rotate_limit=0, p=0.5),
++            A.HorizontalFlip(p=0.5),
++            A.Resize(width=args["RESIZE"][0], height=args["RESIZE"][1]),
++            A.CLAHE(),
++            A.Normalize(
++                mean=[0.56, 0.524, 0.501],
++                std=[0.258, 0.265, 0.267],
++                max_pixel_value=255.0,
++            ),
++            ToTensorV2(),
++        ]
++    )
++
+ 
+ def get_train_face_center_crop_transform(args):
+     """FaceCenterRandomRatioCrop을 사용할 때의 augmentation 입니다.
+ 
+     기존 CenterCrop(중앙 크롭)과 ShiftScaleRotate(위치 이동)을 생략합니다.
+     """
+-    return A.Compose([
+-                    # A.CenterCrop(height=int(512*0.9), width=int(384*0.9), p=1),
+-                    # A.ShiftScaleRotate(scale_limit=0, shift_limit=0.02, rotate_limit=0, p=0.5),
+-                    A.HorizontalFlip(p=0.5),
+-                    A.Resize(width=args["RESIZE"][0], height=args["RESIZE"][1]),
+-                    A.CLAHE(),
+-                    A.Normalize(
+-                        mean=[0.56, 0.524, 0.501],
+-                        std=[0.258, 0.265, 0.267],
+-                        max_pixel_value=255.0),
+-                    ToTensorV2()
+-                    ])
++    return A.Compose(
++        [
++            # A.CenterCrop(height=int(512*0.9), width=int(384*0.9), p=1),
++            # A.ShiftScaleRotate(scale_limit=0, shift_limit=0.02, rotate_limit=0, p=0.5),
++            A.HorizontalFlip(p=0.5),
++            A.Resize(width=args["RESIZE"][0], height=args["RESIZE"][1]),
++            A.CLAHE(),
++            A.Normalize(
++                mean=[0.56, 0.524, 0.501],
++                std=[0.258, 0.265, 0.267],
++                max_pixel_value=255.0,
++            ),
++            ToTensorV2(),
++        ]
++    )
++
+ 
+ def get_valid_transform(args):
+-    return A.Compose([
+-                    A.CenterCrop(height=int(512*0.9), width=int(384*0.9), p=1),
+-                    A.Resize(width=args["RESIZE"][0], height=args["RESIZE"][1]),
+-                    A.Normalize(
+-                        mean=[0.56, 0.524, 0.501],
+-                        std=[0.258, 0.265, 0.267],
+-                        max_pixel_value=255.0),
+-                    ToTensorV2()
+-                    ])
++    return A.Compose(
++        [
++            A.CenterCrop(height=int(512 * 0.9), width=int(384 * 0.9), p=1),
++            A.Resize(width=args["RESIZE"][0], height=args["RESIZE"][1]),
++            A.Normalize(
++                mean=[0.56, 0.524, 0.501],
++                std=[0.258, 0.265, 0.267],
++                max_pixel_value=255.0,
++            ),
++            ToTensorV2(),
++        ]
++    )
++
+ 
+ def pre_transform(args):
+-    return A.Compose([
+-                    A.CenterCrop(height=470, width=340, p=1),
+-                    A.ShiftScaleRotate(scale_limit=0, shift_limit=0.02, rotate_limit=0, p=0.5),
+-                    A.Resize(width=args["RESIZE"][0], height=args["RESIZE"][1]),
+-                    ]) 
+-    
++    return A.Compose(
++        [
++            A.CenterCrop(height=470, width=340, p=1),
++            A.ShiftScaleRotate(scale_limit=0, shift_limit=0.02, rotate_limit=0, p=0.5),
++            A.Resize(width=args["RESIZE"][0], height=args["RESIZE"][1]),
++        ]
++    )
+diff --git a/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/utils/dataset.py b/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/utils/dataset.py
+index 98f3487..7c8b540 100644
+--- a/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/utils/dataset.py
++++ b/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/utils/dataset.py
+@@ -1,10 +1,9 @@
+ import cv2
+-from tqdm import tqdm
+ from torch.utils.data import Dataset
+-import pandas as pd
+ 
+ from utils.augmentation import FaceCenterRandomRatioCrop
+ 
++
+ class MaskDataset(Dataset):
+     def __init__(self, dataframe, transform=None, multi_output=False):
+         super().__init__()
+@@ -26,7 +25,7 @@ class MaskDataset(Dataset):
+ 
+         if self.transform:
+             img = self.transform(image=img)["image"]
+-        
++
+         if not self.multi_output:
+             return img, label
+         else:
+@@ -34,7 +33,7 @@ class MaskDataset(Dataset):
+                 "mask": self.mask_label[index],
+                 "gender": self.gender_label[index],
+                 "age": self.age_label[index],
+-                "ans": label
++                "ans": label,
+             }
+ 
+     def __len__(self):
+@@ -42,14 +41,14 @@ class MaskDataset(Dataset):
+ 
+ 
+ class MaskFaceCenterDataset(Dataset):
+-    """utils/augmentation/FaceCenterRandomRatioCrop을 사용할 때의 Dataset
+-    """
++    """utils/augmentation/FaceCenterRandomRatioCrop을 사용할 때의 Dataset"""
++
+     def __init__(self, dataframe, transform=None, multi_output=False):
+         super().__init__()
+         self.img_path = dataframe["img_path"].values
+-        self.bbox = dataframe[[
+-            "deepface_bbox_h", "deepface_bbox_w", "deepface_bbox_x", "deepface_bbox_y"
+-        ]].values
++        self.bbox = dataframe[
++            ["deepface_bbox_h", "deepface_bbox_w", "deepface_bbox_x", "deepface_bbox_y"]
++        ].values
+         self.label = dataframe["all"].values
+         self.multi_output = multi_output
+         if self.multi_output:
+@@ -68,17 +67,19 @@ class MaskFaceCenterDataset(Dataset):
+ 
+         if self.transform:
+             h, w, x, y = self.bbox[index, :]
+-            img, face_area_ratio = self.face_center_crop({"image": img, "bbox": (h, w, x, y)})
++            img, face_area_ratio = self.face_center_crop(
++                {"image": img, "bbox": (h, w, x, y)}
++            )
+             img = self.transform(image=img)["image"]
+ 
+         if not self.multi_output:
+-            return { "image": img, "ratio": face_area_ratio }, label
++            return {"image": img, "ratio": face_area_ratio}, label
+         else:
+-            return { "image": img, "ratio": face_area_ratio }, {
++            return {"image": img, "ratio": face_area_ratio}, {
+                 "mask": self.mask_label[index],
+                 "gender": self.gender_label[index],
+                 "age": self.age_label[index],
+-                "ans": label
++                "ans": label,
+             }
+ 
+     def __len__(self):
+@@ -92,14 +93,15 @@ class MaskTestDataset(Dataset):
+         self.transform = transform
+ 
+     def __getitem__(self, index):
+-        img = cv2.imread("/opt/ml/input/data/eval/images/" + self.id[index], cv2.IMREAD_COLOR)
++        img = cv2.imread(
++            "/opt/ml/input/data/eval/images/" + self.id[index], cv2.IMREAD_COLOR
++        )
+         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+ 
+         if self.transform:
+             img = self.transform(image=img)["image"]
+-        
+-        return img, self.id[index]
+ 
++        return img, self.id[index]
+ 
+     def __len__(self):
+         return len(self.id)
+diff --git a/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/utils/loss.py b/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/utils/loss.py
+index 2ae15ab..74e39b2 100644
+--- a/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/utils/loss.py
++++ b/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/utils/loss.py
+@@ -5,8 +5,7 @@ import torch.nn.functional as F
+ 
+ # https://discuss.pytorch.org/t/is-this-a-correct-implementation-for-focal-loss-in-pytorch/43327/8
+ class FocalLoss(nn.Module):
+-    def __init__(self, weight=None,
+-                 gamma=2., reduction='mean'):
++    def __init__(self, weight=None, gamma=2.0, reduction="mean"):
+         nn.Module.__init__(self)
+         self.weight = weight
+         self.gamma = gamma
+@@ -19,7 +18,7 @@ class FocalLoss(nn.Module):
+             ((1 - prob) ** self.gamma) * log_prob,
+             target_tensor,
+             weight=self.weight,
+-            reduction=self.reduction
++            reduction=self.reduction,
+         )
+ 
+ 
+@@ -46,6 +45,7 @@ class F1Loss(nn.Module):
+         super().__init__()
+         self.classes = classes
+         self.epsilon = epsilon
++
+     def forward(self, y_pred, y_true):
+         assert y_pred.ndim == 2
+         assert y_true.ndim == 1
+@@ -53,7 +53,7 @@ class F1Loss(nn.Module):
+         y_pred = F.softmax(y_pred, dim=1)
+ 
+         tp = (y_true * y_pred).sum(dim=0).to(torch.float32)
+-        tn = ((1 - y_true) * (1 - y_pred)).sum(dim=0).to(torch.float32)
++        # tn = ((1 - y_true) * (1 - y_pred)).sum(dim=0).to(torch.float32)
+         fp = ((1 - y_true) * y_pred).sum(dim=0).to(torch.float32)
+         fn = (y_true * (1 - y_pred)).sum(dim=0).to(torch.float32)
+ 
+@@ -67,20 +67,19 @@ class F1Loss(nn.Module):
+ 
+ # https://www.kaggle.com/c/cassava-leaf-disease-classification/discussion/208239
+ class SymmetricCrossEntropyLoss(nn.Module):
+-    
+-    def __init__(self, alpha=0.1, beta=1.0, num_classes= 18):
++    def __init__(self, alpha=0.1, beta=1.0, num_classes=18):
+         super(SymmetricCrossEntropyLoss, self).__init__()
+         self.alpha = alpha
+         self.beta = beta
+         self.num_classes = num_classes
+ 
+-    def forward(self, logits, targets, reduction='mean'):
++    def forward(self, logits, targets, reduction="mean"):
+         onehot_targets = torch.eye(self.num_classes)[targets].cuda()
+         ce_loss = F.cross_entropy(logits, targets, reduction=reduction)
+-        rce_loss = (-onehot_targets*logits.softmax(1).clamp(1e-7, 1.0).log()).sum(1)
+-        if reduction == 'mean':
++        rce_loss = (-onehot_targets * logits.softmax(1).clamp(1e-7, 1.0).log()).sum(1)
++        if reduction == "mean":
+             rce_loss = rce_loss.mean()
+-        elif reduction == 'sum':
++        elif reduction == "sum":
+             rce_loss = rce_loss.sum()
+         return self.alpha * ce_loss + self.beta * rce_loss
+ 
+@@ -101,7 +100,7 @@ class CrossEntropyF1Loss(nn.Module):
+         y_pred = F.softmax(y_pred, dim=1)
+ 
+         tp = (y_true * y_pred).sum(dim=0).to(torch.float32)
+-        tn = ((1 - y_true) * (1 - y_pred)).sum(dim=0).to(torch.float32)
++        # tn = ((1 - y_true) * (1 - y_pred)).sum(dim=0).to(torch.float32)
+         fp = ((1 - y_true) * y_pred).sum(dim=0).to(torch.float32)
+         fn = (y_true * (1 - y_pred)).sum(dim=0).to(torch.float32)
+ 
+@@ -113,8 +112,9 @@ class CrossEntropyF1Loss(nn.Module):
+ 
+         f1_loss = 1 - f1.mean()
+ 
+-        return 0.5*f1_loss + 0.5*ce_loss
+-   
++        return 0.5 * f1_loss + 0.5 * ce_loss
++
++
+ class CrossEntropyLossWithLabelSmoothing(nn.Module):
+     def __init__(self, n_dim=18, ls_=0.9):
+         super().__init__()
+@@ -133,13 +133,13 @@ class CrossEntropyLossWithLabelSmoothing(nn.Module):
+ 
+ 
+ _criterion_entrypoints = {
+-    'cross_entropy': nn.CrossEntropyLoss,
+-    'focal': FocalLoss,
+-    'label_smoothing': LabelSmoothingLoss,
+-    'f1': F1Loss,
+-    'symmetric_cross_entropy': SymmetricCrossEntropyLoss,
+-    'cross_entropy_f1': CrossEntropyF1Loss,
+-    'cross_entropy_label_smoothing' : CrossEntropyLossWithLabelSmoothing
++    "cross_entropy": nn.CrossEntropyLoss,
++    "focal": FocalLoss,
++    "label_smoothing": LabelSmoothingLoss,
++    "f1": F1Loss,
++    "symmetric_cross_entropy": SymmetricCrossEntropyLoss,
++    "cross_entropy_f1": CrossEntropyF1Loss,
++    "cross_entropy_label_smoothing": CrossEntropyLossWithLabelSmoothing,
+ }
+ 
+ 
+@@ -156,5 +156,5 @@ def create_criterion(criterion_name, **kwargs):
+         create_fn = criterion_entrypoint(criterion_name)
+         criterion = create_fn(**kwargs)
+     else:
+-        raise RuntimeError('Unknown loss (%s)' % criterion_name)
++        raise RuntimeError("Unknown loss (%s)" % criterion_name)
+     return criterion
+diff --git a/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/utils/util.py b/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/utils/util.py
+index e4162da..400e2d0 100644
+--- a/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/utils/util.py
++++ b/Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/utils/util.py
+@@ -1,14 +1,11 @@
++import logging
+ import os
+-import time
+ import random
+-import logging
++import time
+ from pathlib import Path
+-import albumentations as A
+-import matplotlib.pyplot as plt
+-from sklearn.metrics import f1_score
+-from albumentations.pytorch import ToTensorV2
+-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+-import wandb
++
++import matplotlib as plt
++from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix, f1_score
+ 
+ # def get_train_transform(args):
+ #     return A.Compose([
+@@ -39,8 +36,8 @@ import wandb
+ #                     A.CenterCrop(height=470, width=340, p=1),
+ #                     A.ShiftScaleRotate(scale_limit=0, shift_limit=0.02, rotate_limit=0, p=0.5),
+ #                     A.Resize(width=args["RESIZE"][0], height=args["RESIZE"][1]),
+-#                     ]) 
+-    
++#                     ])
++
+ 
+ def train_test_split_by_folder(data, test_size):
+ 
+@@ -52,6 +49,7 @@ def train_test_split_by_folder(data, test_size):
+ 
+     return X_train, X_valid
+ 
++
+ def age_group(x, upper_bound):
+     if x < 30:
+         return 0
+@@ -60,6 +58,7 @@ def age_group(x, upper_bound):
+     else:
+         return 2
+ 
++
+ def age_group_6(x, upper_bound):
+     if x < 20:
+         return 0
+@@ -74,65 +73,89 @@ def age_group_6(x, upper_bound):
+     else:
+         return 5
+ 
++
+ def age_bound(args, dataframe):
+-    dataframe["age_group"] = dataframe['age_indv'].apply(lambda x : age_group(x, args["AGE_BOUND"]))
+-    dataframe['all'] = dataframe['mask'] * 6 + dataframe['gender'] * 3 + dataframe['age_group']
++    dataframe["age_group"] = dataframe["age_indv"].apply(
++        lambda x: age_group(x, args["AGE_BOUND"])
++    )
++    dataframe["all"] = (
++        dataframe["mask"] * 6 + dataframe["gender"] * 3 + dataframe["age_group"]
++    )
+     return dataframe
+ 
++
+ def age_bound_6(args, dataframe):
+-    dataframe["age_group"] = dataframe['age_indv'].apply(lambda x : age_group_6(x, args["AGE_BOUND"]))
+-    dataframe['all'] = dataframe['mask'] * 6 + dataframe['gender'] * 3 + (dataframe['age_group']+1) // 3
++    dataframe["age_group"] = dataframe["age_indv"].apply(
++        lambda x: age_group_6(x, args["AGE_BOUND"])
++    )
++    dataframe["all"] = (
++        dataframe["mask"] * 6
++        + dataframe["gender"] * 3
++        + (dataframe["age_group"] + 1) // 3
++    )
+     return dataframe
+ 
++
+ def load_checkpoint(checkpoint, model, optimizer, lr=None):
+     model.load_state_dict(checkpoint["state_dict"])
+     optimizer.load_state_dict(checkpoint["optimizer"])
+-    
++
+     if lr is not None:
+         for param_groups in optimizer.param_groups:
+             param_groups["lr"] = lr
+ 
+     print("Loaded Checkpoint.. ")
+ 
++
+ def get_log(args):
+     logger = logging.getLogger()
+     logging.basicConfig(level=logging.INFO)
+     logger.setLevel(logging.INFO)
+-    
++
+     model_type = args["MODEL"]
+ 
+     if not os.path.exists("log"):
+         os.makedirs("log")
+-        
+-    stream_handler = logging.FileHandler(f"log/{model_type}_{time.strftime('%m%d-%H-%M-%S')}.txt", mode='w', encoding='utf8')
++
++    stream_handler = logging.FileHandler(
++        f"log/{model_type}_{time.strftime('%m%d-%H-%M-%S')}.txt",
++        mode="w",
++        encoding="utf8",
++    )
+     logger.addHandler(stream_handler)
+-    
++
+     return logger
+ 
++
+ def wandb_init(args, wandb, time_stamp):
+-    
+-    wandb.init(project="test-project", entity="ai3_cv4", name = f"{args['MODEL']}_MYINITIAL")
+-
+-    wandb.config.update({
+-    "Model": args["MODEL"],
+-    "Loss": args["CRITERION"],
+-    "Optimizer": args["OPTIMIZER"],
+-    "Resize": args["RESIZE"],
+-    "learning_rate": args["LEARNING_RATE"],
+-    "batch_size": args["BATCH_SIZE"],
+-    "Weight decay": args["WEIGHT_DECAY"],
+-    "Age bound": args["AGE_BOUND"],
+-    })
++
++    wandb.init(
++        project="test-project", entity="dudskrla", name=f"{args['MODEL']}_MYINITIAL"
++    )
++
++    wandb.config.update(
++        {
++            "Model": args["MODEL"],
++            "Loss": args["CRITERION"],
++            "Optimizer": args["OPTIMIZER"],
++            "Resize": args["RESIZE"],
++            "learning_rate": args["LEARNING_RATE"],
++            "batch_size": args["BATCH_SIZE"],
++            "Weight decay": args["WEIGHT_DECAY"],
++            "Age bound": args["AGE_BOUND"],
++        }
++    )
++
+ 
+ def print_metrics(best_val_preds, val_labels, fpath):
+ 
+     fname = fpath.split("/")[-1]
+     save_dir = "fig/" + "/".join(fpath.split("/")[:-1])
+-    
++
+     path = Path(save_dir)
+     path.mkdir(parents=True, exist_ok=True)
+ 
+-    f1 = f1_score(val_labels, best_val_preds, average='macro')
++    f1 = f1_score(val_labels, best_val_preds, average="macro")
+     f1 = round(f1, 4)
+ 
+     cm = confusion_matrix(val_labels, best_val_preds)
+@@ -142,4 +165,4 @@ def print_metrics(best_val_preds, val_labels, fpath):
+     fig = plt.gcf()
+     fig.set_size_inches(7, 7)
+     fig.suptitle(f"{fname}, F-1 score: {f1}")
+-    plt.savefig(f"{save_dir}/{fname}.png")
+\ No newline at end of file
++    plt.savefig(f"{save_dir}/{fname}.png")

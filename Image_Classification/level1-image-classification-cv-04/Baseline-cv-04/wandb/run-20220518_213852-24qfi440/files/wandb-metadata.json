@@ -1,0 +1,30 @@
+{
+    "os": "Linux-4.4.0-59-generic-x86_64-with-glibc2.17",
+    "python": "3.8.13",
+    "heartbeatAt": "2022-05-18T21:38:53.178116",
+    "startedAt": "2022-05-18T21:38:52.148130",
+    "docker": null,
+    "gpu": "Tesla V100-PCIE-32GB",
+    "gpu_count": 1,
+    "cpu_count": 8,
+    "cuda": null,
+    "args": [
+        "--model",
+        "resnet18",
+        "--resize",
+        "256",
+        "256"
+    ],
+    "state": "running",
+    "program": "main.py",
+    "codePath": "Image_Classification/level1-image-classification-cv-04/Baseline-cv-04/main.py",
+    "git": {
+        "remote": "https://github.com/dudskrla/boostcamp-ai-tech-3.git",
+        "commit": "3b071442ed79942ddf5aa16aa6552ab88b7c2247"
+    },
+    "email": "dudskrla09@gmail.com",
+    "root": "/opt/ml/boostcamp-ai-tech-3",
+    "host": "27ff1f82e0eb",
+    "username": "root",
+    "executable": "/opt/conda/envs/mask/bin/python"
+}
